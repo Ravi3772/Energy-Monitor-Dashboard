@@ -1,0 +1,130 @@
+<div class="meter-management" [class.loaded]="meters.length > 0">
+  <div class="meters-hero">
+    <div class="meters-hero__bg"></div>
+    <div class="meters-hero__bg--overlay"></div>
+    <div class="meters-hero__inner">
+      <h1 class="meters-hero__title">Meters Management</h1>
+      <p class="meters-hero__subtitle">View all meters and the distribution line each meter is assigned to.</p>
+    </div>
+  </div>
+
+  @if (isAdmin()) {
+  <div class="card">
+    <h3>{{ isEditMode ? 'Update Meter' : 'Register New Meter' }}</h3>
+    <div style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+      <div>
+        <label>Meter Code</label><br>
+        <input [(ngModel)]="currentMeter.meterCode" class="form-input" placeholder="e.g. MAC0001" />
+      </div>
+
+      <div>
+        <label>Assigned Line</label><br>
+        <select [(ngModel)]="currentMeter.lineId" class="form-input">
+          <option [ngValue]="null">-- Select Line --</option>
+          <option *ngFor="let line of lines" [ngValue]="line.lineId">
+            {{ line.lineName }} (ID: {{line.lineId}})
+          </option>
+        </select>
+      </div>
+
+      <div>
+        <label>Status</label><br>
+        <select [(ngModel)]="currentMeter.status" class="form-input">
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+
+      <button (click)="saveMeter()" class="btn-save">
+        {{ isEditMode ? 'Save Changes' : 'Register' }}
+      </button>
+
+      <button *ngIf="isEditMode" (click)="resetForm()" class="btn-cancel">
+        Cancel
+      </button>
+    </div>
+  </div>
+  }
+
+  <div class="card search-section">
+    <label><strong>Quick Search by ID:</strong></label>
+    <input type="number" [(ngModel)]="searchId" placeholder="Meter ID..." class="form-input search-input" />
+    <button (click)="fetchSingleMeter()" class="btn-search">Search</button>
+    <button (click)="searchId = null; fetchSingleMeter()" class="btn-clear">Clear</button>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Meter ID</th>
+          <th>Meter Code</th>
+          <th>Line</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let m of displayMeters">
+          <td>{{ m.meterId }}</td>
+          <td>
+            <a [routerLink]="['/meters', m.meterId]" class="meter-link">
+              {{ m.meterCode }}
+            </a>
+          </td>
+          <td class="line-cell">{{ lineLabel(m) }}</td>
+          <td>
+            <span [style.color]="m.status === 'Active' ? '#10b981' : '#ef4444'" style="font-weight: 600;">
+              {{ m.status }}
+            </span>
+          </td>
+          <td>
+            @if (isAdmin()) {
+              <button class="action-btn edit" (click)="editMeter(m)">Edit</button>
+              <button class="action-btn delete" (click)="deleteMeter(m.meterId)">Delete</button>
+            } @else {
+              <span class="muted">View only</span>
+            }
+          </td>
+        </tr>
+        <tr *ngIf="displayMeters.length === 0">
+          <td colspan="6" class="empty-msg">No meters found.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="pagination-footer">
+      <div class="entries-selector">
+        <span class="muted">Show </span>
+        <input 
+          type="number" 
+          [(ngModel)]="pageSize" 
+          (change)="onPageSizeChange()" 
+          min="1" max="10" 
+          class="pageSize-input"
+        />
+        <span class="muted"> entries</span>
+      </div>
+
+      <div class="pagination-navigation">
+        <span class="page-info">
+          Page <strong>{{currentPage}}</strong> of {{totalPages || 1}}
+        </span>
+        <div class="pagination-buttons">
+          <button 
+            class="btn-pagination" 
+            (click)="changePage(-1)" 
+            [disabled]="currentPage === 1">
+            &larr; Previous
+          </button>
+          <button 
+            class="btn-pagination" 
+            (click)="changePage(1)" 
+            [disabled]="currentPage === totalPages || totalPages === 0">
+            Next &rarr;
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

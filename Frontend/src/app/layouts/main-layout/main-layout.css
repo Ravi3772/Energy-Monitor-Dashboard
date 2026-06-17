@@ -1,0 +1,50 @@
+.layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.content {
+  margin-left: 220px;
+  flex: 1;
+  background: var(--bg-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  transition: margin-left 0.3s ease;
+}
+
+@media (min-width: 901px) {
+  .layout.layout--collapsed .content {
+    margin-left: 72px;
+  }
+}
+
+@media (max-width: 900px) {
+  .content {
+    margin-left: 0;
+  }
+}
+
+.page {
+  flex: 1;
+  padding: 20px;
+}
+
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.45);
+  z-index: 999;
+  display: none;
+  pointer-events: none;
+}
+
+.sidebar-overlay--visible {
+  display: block;
+  pointer-events: auto;
+}

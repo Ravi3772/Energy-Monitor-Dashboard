@@ -1,0 +1,142 @@
+<div class="line-detail" [class.line-detail--loaded]="!loading && !loadError">
+  @if (loading) {
+    <div class="line-detail__state" aria-live="polite">
+      <div class="line-detail__skeleton line-detail__skeleton--hero"></div>
+      <div class="line-detail__skeleton-grid">
+        <div class="line-detail__skeleton"></div>
+        <div class="line-detail__skeleton"></div>
+        <div class="line-detail__skeleton"></div>
+      </div>
+      <p class="line-detail__loading-text">Loading line…</p>
+    </div>
+  } @else if (loadError) {
+    <div class="line-detail__error card-elevated" role="alert">
+      <h2 class="line-detail__error-title">Line unavailable</h2>
+      <p class="line-detail__error-msg">{{ loadError }}</p>
+      <button type="button" class="btn-back" (click)="backToLines()">← Back to lines</button>
+    </div>
+  } @else if (lineMeta) {
+    <header class="line-hero">
+      <div class="line-hero__bg" aria-hidden="true"></div>
+      <div class="line-hero__inner">
+        <button type="button" class="line-hero__back" (click)="backToLines()">
+          <span class="line-hero__back-icon" aria-hidden="true">←</span>
+          Back to Lines
+        </button>
+        <div class="line-hero__titles">
+          <p class="line-hero__eyebrow">Distribution line</p>
+          <h1 class="line-hero__title">{{ lineMeta.lineName }}</h1>
+          <p class="line-hero__location">
+            <span class="line-hero__pin" aria-hidden="true">◎</span>
+            {{ lineMeta.location }}
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <section class="line-stats" aria-label="Line summary">
+      <article class="stat-card stat-card--1">
+        <span class="stat-card__label">Total energy (all time)</span>
+        <span class="stat-card__value">{{ totalKwhDisplay }} <span class="stat-card__unit">kWh</span></span>
+      </article>
+      <article class="stat-card stat-card--2">
+        <span class="stat-card__label">Meters on line</span>
+        <span class="stat-card__value">{{ metersOnLine.length }}</span>
+      </article>
+      <article class="stat-card stat-card--3">
+        <span class="stat-card__label">Active meters</span>
+        <span class="stat-card__value">{{ activeMeterCount }}</span>
+      </article>
+    </section>
+
+    <section class="line-chart-section card-elevated" aria-labelledby="line-chart-heading">
+      <div class="line-chart-section__head">
+        <div>
+          <h2 id="line-chart-heading" class="section-title">Daily consumption</h2>
+          <p class="section-sub">
+            Aggregated kWh per day for
+            <strong>{{ monthNames[selectedMonth - 1] }} {{ selectedYear }}</strong>
+          </p>
+        </div>
+        <div class="period-controls">
+          <label class="sr-only" for="line-month">Month</label>
+          <select
+            id="line-month"
+            class="period-select"
+            [(ngModel)]="selectedMonth"
+            (ngModelChange)="onPeriodChange()"
+          >
+            @for (m of monthNames; track $index) {
+              <option [ngValue]="$index + 1">{{ m }}</option>
+            }
+          </select>
+          <label class="sr-only" for="line-year">Year</label>
+          <select
+            id="line-year"
+            class="period-select"
+            [(ngModel)]="selectedYear"
+            (ngModelChange)="onPeriodChange()"
+          >
+            @for (y of availableYears; track y) {
+              <option [ngValue]="y">{{ y }}</option>
+            }
+          </select>
+        </div>
+      </div>
+      <div class="chart-wrap" [class.chart-wrap--loading]="chartLoading">
+        @if (chartLoading) {
+          <div class="chart-wrap__overlay" aria-hidden="true"></div>
+        }
+        @if (chartData.labels && chartData.labels!.length > 0) {
+          <div class="chart-canvas-host">
+            <canvas baseChart [data]="chartData" [options]="chartOptions" [type]="'line'"></canvas>
+          </div>
+        } @else if (!chartLoading) {
+          <p class="chart-empty">No daily totals for this month yet.</p>
+        }
+      </div>
+    </section>
+
+    <section class="line-meters card-elevated" aria-labelledby="meters-heading">
+      <div class="line-meters__head">
+        <h2 id="meters-heading" class="section-title">Meters on this line</h2>
+        <p class="section-sub">Open a meter for readings, peaks, and (admin) spike injection.</p>
+      </div>
+      <div class="meter-table-wrap">
+        <table class="meter-table">
+          <thead>
+            <tr>
+              <th scope="col">Code</th>
+              <th scope="col">Status</th>
+              <th scope="col" class="meter-table__col-action">Detail</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (m of metersOnLine; track m.meterId) {
+              <tr class="meter-row">
+                <td>
+                  <span class="meter-code">{{ m.meterCode }}</span>
+                </td>
+                <td>
+                  <span
+                    class="status-pill"
+                    [class.status-pill--active]="(m.status || '').toLowerCase() === 'active'"
+                  >
+                    {{ m.status || '—' }}
+                  </span>
+                </td>
+                <td class="meter-table__col-action">
+                  <a [routerLink]="['/meters', m.meterId]" class="meter-link">View meter</a>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="3" class="meter-table__empty">No meters are assigned to this line.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  }
+</div>

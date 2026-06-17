@@ -1,0 +1,22 @@
+<div
+  class="layout"
+  [class.layout--collapsed]="layout.sidebarCollapsed()"
+  [class.layout--drawer-open]="layout.mobileDrawerOpen()"
+>
+  <div
+    class="sidebar-overlay"
+    [class.sidebar-overlay--visible]="layout.mobileDrawerOpen()"
+    (click)="layout.closeMobileDrawer()"
+    aria-hidden="true"
+  ></div>
+
+  <app-sidebar />
+
+  <div class="content">
+    <app-navbar />
+
+    <div class="page">
+      <router-outlet />
+    </div>
+  </div>
+</div>

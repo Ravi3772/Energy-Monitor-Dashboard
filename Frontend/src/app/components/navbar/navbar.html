@@ -1,0 +1,96 @@
+<header class="navbar">
+  <div class="navbar-left">
+    <button
+      type="button"
+      class="menu-toggle"
+      (click)="layout.toggleMenu()"
+      [attr.aria-expanded]="
+        layout.isMobileView() ? layout.mobileDrawerOpen() : !layout.sidebarCollapsed()
+      "
+      aria-controls="app-sidebar-nav"
+      title="Menu"
+    >
+      <span class="material-icons" aria-hidden="true">menu</span>
+    </button>
+    <div class="navbar-titles">
+      <h2 class="navbar-title">Dunelect</h2>
+      <p class="navbar-tagline">Where energy meets intelligence</p>
+    </div>
+  </div>
+
+  <div class="navbar-right">
+    @if (auth.getUsername(); as name) {
+      <span class="navbar-user" title="Signed-in user">{{ name }}</span>
+    }
+    @if (auth.role(); as r) {
+      <span class="role-pill" [attr.data-role]="r">
+        @if (r === 'operator') {
+          <span class="role-pill__icon-slot" aria-hidden="true">
+            <app-operator-monitor-icon class="role-pill__op-monitor" size="sm" />
+          </span>
+        } @else {
+          <span class="material-icons role-pill__icon mi-fixed" aria-hidden="true">admin_panel_settings</span>
+        }
+        {{ r === 'admin' ? 'Admin' : 'Operator' }}
+      </span>
+    }
+
+    @if (auth.role() === 'admin') {
+      <div class="admin-operator-slot">
+        <button type="button" class="add-operator-trigger" (click)="toggleAddOperator()">
+          Add operator
+        </button>
+        @if (addOperatorOpen()) {
+          <div class="add-operator-panel" role="dialog" aria-label="Create operator account">
+            <form (ngSubmit)="createOperator()" class="add-operator-form">
+              <div class="add-operator-form__title">New operator</div>
+              <label class="add-operator-label">
+                <span>Username</span>
+                <input
+                  type="text"
+                  name="opUser"
+                  class="add-operator-input"
+                  [(ngModel)]="newOperatorUsername"
+                  autocomplete="off"
+                  placeholder="e.g. jane.doe"
+                  [disabled]="addOperatorBusy()"
+                />
+              </label>
+              <label class="add-operator-label">
+                <span>Password</span>
+                <input
+                  type="password"
+                  name="opPass"
+                  class="add-operator-input"
+                  [(ngModel)]="newOperatorPassword"
+                  autocomplete="new-password"
+                  placeholder="Min. 8 characters"
+                  [disabled]="addOperatorBusy()"
+                />
+              </label>
+              @if (addOperatorError(); as err) {
+                <p class="add-operator-msg add-operator-msg--err">{{ err }}</p>
+              }
+              @if (addOperatorSuccess(); as ok) {
+                <p class="add-operator-msg add-operator-msg--ok">{{ ok }}</p>
+              }
+              <div class="add-operator-actions">
+                <button type="button" class="add-operator-btn secondary" (click)="closeAddOperator()">
+                  Close
+                </button>
+                <button type="submit" class="add-operator-btn primary" [disabled]="addOperatorBusy()">
+                  {{ addOperatorBusy() ? 'Creating…' : 'Create' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        }
+      </div>
+    }
+
+    <button type="button" class="sign-out" (click)="signOut()" aria-label="Sign out">
+      <span class="material-icons" aria-hidden="true">logout</span>
+      <span class="sign-out__label">Sign out</span>
+    </button>
+  </div>
+</header>

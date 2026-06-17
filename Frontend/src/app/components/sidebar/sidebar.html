@@ -1,0 +1,42 @@
+<div
+  class="sidebar"
+  [class.sidebar--collapsed]="layout.sidebarCollapsed()"
+  [class.sidebar--drawer-open]="layout.mobileDrawerOpen()"
+>
+  <h2 class="logo">
+    <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+    </svg>
+    <span class="logo-text">Dunelect</span>
+  </h2>
+
+  <nav class="sidebar-nav" id="app-sidebar-nav" aria-label="Main navigation">
+    <a
+      routerLink="/"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      title="Dashboard"
+      (click)="navSelect()"
+    >
+      <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      <span>Dashboard</span>
+    </a>
+    <a routerLink="/lines" routerLinkActive="active" title="Power Lines" (click)="navSelect()">
+      <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M6 9l6-6 6 6"></path>
+        <path d="M6 15l6 6 6-6"></path>
+      </svg>
+      <span>Lines</span>
+    </a>
+    <a routerLink="/meters" routerLinkActive="active" title="Energy Meters" (click)="navSelect()">
+      <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="9"></circle>
+        <path d="M12 7v5l3 3"></path>
+      </svg>
+      <span>Meters</span>
+    </a>
+  </nav>
+</div>

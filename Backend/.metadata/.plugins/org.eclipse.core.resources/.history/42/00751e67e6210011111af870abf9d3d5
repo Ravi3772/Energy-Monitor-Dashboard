@@ -1,0 +1,59 @@
+package dbInsertion;
+
+package com.example;
+
+import java.io.File;
+import java.sql.*;
+import java.util.Date;
+ 
+public class batchfile {
+  public static void main(String[] args) throws Exception {
+    String filePath = args.length > 0 ? args[0] : "C:\\Users\\2475007\\OneDrive - Cognizant\\Desktop\\samins.txt";
+    String url = "jdbc:mysql://localhost:3306/dunelect?allowLoadLocalInfile=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC";
+    String user = "root";
+    String pass = "Ravi@pex123y";
+ 
+    try (Connection conn = DriverManager.getConnection(url, user, pass);
+         Statement st = conn.createStatement()) {
+ 
+      st.execute("CREATE TABLE IF NOT EXISTS energy_readings (" +
+                 "id BIGINT AUTO_INCREMENT PRIMARY KEY," +
+                 "meter_id INT NOT NULL," +
+                 "`time_stamp` DATETIME NOT NULL," +
+                 "kwh DECIMAL(10,3) NOT NULL) ENGINE=InnoDB");
+ 
+      File f = new File(filePath);
+      System.out.println("Loading file: " + f.getAbsolutePath());
+      System.out.println("Exists=" + f.exists() + " Size=" + f.length() + " LastModified=" + new Date(f.lastModified()));
+ 
+      long before = 0;
+      try (ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM energy_readings")) { rs.next(); before = rs.getLong(1); }
+      System.out.println("Rows before=" + before);
+ 
+      String escaped = filePath.replace("\\", "\\\\");
+      String sql =
+          "LOAD DATA LOCAL INFILE '" + escaped + "' " +
+          "INTO TABLE energy_readings " +
+          "FIELDS TERMINATED BY ',' " +
+          "OPTIONALLY ENCLOSED BY '\"' " +
+          "LINES TERMINATED BY '\\n' " +
+          "IGNORE 1 LINES " +
+          "(@id, @ts, @e) " +
+          "SET meter_id=@id, `time_stamp`=STR_TO_DATE(@ts,'%Y-%m-%d %H:%i:%s'), kwh=@e";
+ 
+      int loaded = st.executeUpdate(sql);
+      System.out.println("Loaded rows (updateCount)=" + loaded);
+ 
+      try (ResultSet wrs = st.executeQuery("SHOW WARNINGS")) {
+        boolean any = false;
+        while (wrs.next()) { any = true; System.out.println("Warning: " + wrs.getString(1) + " | " + wrs.getString(2) + " | " + wrs.getString(3)); }
+        if (!any) System.out.println("No warnings");
+      }
+ 
+      long after = 0;
+      try (ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM energy_readings")) { rs.next(); after = rs.getLong(1); }
+      System.out.println("Rows after=" + after);
+      System.out.println("Delta=" + (after - before));
+    }
+  }
+}

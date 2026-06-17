@@ -1,0 +1,93 @@
+<div class="meter-detail-container" [class.loaded]="meterObj !== null">
+  <header class="meter-hero">
+    <div class="meter-hero__bg"></div>
+    <div class="meter-hero__bg--overlay"></div>
+    <div class="meter-hero__inner">
+      <button routerLink="/meters" class="meter-hero__back">← Back to meters</button>
+      <div class="meter-hero__titles">
+        <h1 class="meter-hero__title">Meter: {{ meterObj?.meterCode }}</h1>
+        @if (meterObj?.lineName) {
+          <p class="meter-hero__location">Line: {{ meterObj.lineName }}</p>
+        }
+      </div>
+    </div>
+  </header>
+
+  <div class="main-grid">
+    <!-- Graph Card -->
+    <div class="card graph-card">
+      <div class="card-header">
+        <div class="card-header__left">
+          <h3>Power Consumption Trend</h3>
+          <span class="badge">Every 30 Mins</span>
+        </div>
+        <div class="card-header__right">
+          <label for="meter-date-filter" class="date-filter-label">Date:</label>
+          <input type="date" id="meter-date-filter" [(ngModel)]="selectedDate" (change)="applyDateFilter()" class="date-picker">
+        </div>
+      </div>
+      
+      <div class="chart-box">
+        @if (chartData.labels && chartData.labels.length > 0) {
+          <canvas baseChart [data]="chartData" [options]="chartOptions" [type]="'line'"></canvas>
+        } @else {
+          <div class="no-data-msg">
+            No energy readings recorded for {{ selectedDate | date:'longDate' }}
+          </div>
+        }
+      </div>
+    </div>
+    
+    @if (isAdmin()) {
+    <div class="card injection-card">
+      <h3>Inject Energy Spike</h3>
+      <div class="form">
+        <div class="input-group">
+          <label>Consumption (kWh)</label>
+          <input type="number" [(ngModel)]="injection.kwh" class="form-input" placeholder="0.090">
+        </div>
+
+        <div class="input-group">
+          <label>Date</label>
+          <input type="date" [(ngModel)]="injection.date" class="form-input">
+        </div>
+
+        <div class="input-group">
+          <label>Reading Time</label>
+          <select [(ngModel)]="injection.time" class="form-input">
+            <option *ngFor="let slot of timeSlots" [value]="slot">
+              {{ slot }}
+            </option>
+          </select>
+        </div>
+
+        <button (click)="injectSpike()" class="btn-primary">Add Reading</button>
+      </div>
+    </div>
+    }
+  </div>
+
+  <div class="card table-card">
+    <h3>Reading Log for {{ selectedDate }}</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Time (HH:mm)</th>
+          <th>Usage</th>
+          <th>Full Timestamp</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (r of filteredReadings; track r.readingId) {
+          <tr>
+            <td>{{ r.timeStamp.substring(11, 16) }}</td>
+            <td class="usage-val">{{ r.kwh }} kWh</td>
+            <td class="muted">{{ r.timeStamp }}</td>
+          </tr>
+        } @empty {
+          <tr><td colspan="3" class="empty-cell">No data points to display.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

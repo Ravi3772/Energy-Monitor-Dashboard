@@ -1,0 +1,149 @@
+:root {
+
+  --primary-dark: #0F172A;    
+  --primary: #0891B2;   
+  --accent: #6366F1;      
+  
+  --bg-primary: #F0F9FB;        
+  --bg-secondary: #FFFFFF;      
+  
+  --success: #22C55E;    
+  --warning: #F59E0B;    
+  --alert: #EF4444;      
+  
+  --text-primary: #1F2937;      
+  --text-secondary: #6B7280;    
+  --border: #E5E7EB;            
+  --shadow: rgba(0, 0, 0, 0.1); 
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.page-subtitle {
+  margin: 0.35rem 0 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.page-heading {
+  margin-bottom: 1.25rem;
+}
+
+.page-heading h1 {
+  margin: 0;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Inter', 'Roboto', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', sans-serif;
+  line-height: 1.6;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
+.card {
+  background-color: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px var(--shadow);
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+button, [role="button"] {
+  font-family: inherit;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+}
+
+/* Keep shell controls stable (navbar, login already override locally) */
+.navbar button:hover {
+  transform: none;
+}
+
+.status-success {
+  color: var(--success);
+}
+
+.status-warning {
+  color: var(--warning);
+}
+
+.status-alert {
+  color: var(--alert);
+}
+
+@media (max-width: 1024px) {
+  body {
+    font-size: 14px;
+  }
+  
+  .card {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    font-size: 13px;
+  }
+  
+  .card {
+    padding: 12px;
+    border-radius: 8px;
+  }
+  
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+  h3 { font-size: 1.1rem; }
+  h4 { font-size: 1rem; }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 12px;
+  }
+  
+  .card {
+    padding: 10px;
+    border-radius: 8px;
+  }
+  
+  h1 { font-size: 1.3rem; }
+  h2 { font-size: 1.1rem; }
+  h3 { font-size: 0.95rem; }
+  h4 { font-size: 0.85rem; }
+  
+  button:not(.sign-out), [role="button"] {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}

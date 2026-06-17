@@ -1,0 +1,94 @@
+<div class="lines-container" [class.loaded]="lines.length > 0">
+  <div class="lines-hero">
+    <div class="lines-hero__bg"></div>
+    <div class="lines-hero__bg--overlay"></div>
+    <div class="lines-hero__inner">
+      <h1 class="lines-hero__title">Lines Management</h1>
+      <p class="lines-hero__subtitle">Distribution lines, locations, and how many meters are on each line.</p>
+    </div>
+  </div>
+ 
+  @if (isAdmin()) {
+  <div class="card">
+    <h3 class="card-title">{{ isEditMode ? 'Update Line' : 'Register New Line' }}</h3>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="field-label">Line Name</label>
+        <input [(ngModel)]="currentLine.lineName" placeholder="e.g. Line_A" class="form-input" />
+      </div>
+      <div class="form-group">
+        <label class="field-label">Location</label>
+        <input [(ngModel)]="currentLine.location" placeholder="e.g. Block A" class="form-input" />
+      </div>
+      <div class="form-actions">
+        <button (click)="saveLine()" class="btn-save">
+          {{ isEditMode ? 'Update Line' : 'Register' }}
+        </button>
+        <button *ngIf="isEditMode" (click)="resetForm()" class="btn-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+  }
+ 
+  <div class="card search-section">
+    <div class="search-group">
+      <label class="field-label"><strong>Quick Search by ID : </strong></label>
+      <input type="number" [(ngModel)]="searchId" placeholder="Line ID..." class="form-input search-input" />
+      <button (click)="fetchSingleLine()" class="btn-save">Search</button>
+      <button (click)="searchId = null; fetchSingleLine()" class="btn-clear">Clear</button>
+    </div>
+  </div>
+ 
+  <div class="card table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Line Name</th>
+          <th>Location</th>
+          <th>Meters</th>
+          <th class="action-header">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let line of pagedLines">
+          <td>{{ line.lineId }}</td>
+          <td class="bold">
+            <a [routerLink]="['/lines', line.lineId]" class="line-name-link">{{ line.lineName }}</a>
+          </td>
+          <td>{{ line.location }}</td>
+          <td class="meter-count-cell">{{ line.meterCount ?? '—' }}</td>
+          <td class="action-cell">
+            @if (isAdmin()) {
+              <button (click)="editLine(line)" class="action-link edit-link">Edit</button>
+              <button (click)="deleteLine(line.lineId)" class="action-link delete-link">Delete</button>
+            } @else {
+              <span class="muted">View only</span>
+            }
+          </td>
+        </tr>
+        <tr *ngIf="pagedLines.length === 0">
+          <td colspan="5" class="empty-state">
+            No matching lines found.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+ 
+    <div class="pagination-footer">
+      <div class="entries-selector">
+        <span class="muted">Show </span>
+        <input type="number" [(ngModel)]="pageSize" (change)="onPageSizeChange()" min="1" max="10" class="pageSize-input">
+        <span class="muted"> entries</span>
+      </div>
+ 
+      <div class="pagination-navigation">
+        <span class="page-info">Page <strong>{{currentPage}}</strong> of {{totalPages || 1}}</span>
+        <div class="pagination-buttons">
+          <button class="btn-pagination" (click)="changePage(-1)" [disabled]="currentPage === 1">&larr; Previous</button>
+          <button class="btn-pagination" (click)="changePage(1)" [disabled]="currentPage === totalPages || totalPages === 0">Next &rarr;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

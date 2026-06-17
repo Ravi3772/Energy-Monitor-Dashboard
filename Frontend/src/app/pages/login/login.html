@@ -1,0 +1,117 @@
+<div class="login-page">
+  <div class="login-backdrop" aria-hidden="true"></div>
+
+  <aside class="login-brand">
+    <div class="login-brand__content">
+      <div class="login-brand__mark" aria-hidden="true">
+        <span class="material-icons login-brand__mark-icon">bolt</span>
+      </div>
+      <h1 class="login-brand__title">Dunelect</h1>
+      <p class="login-brand__tagline">Internal energy intelligence</p>
+      <ul class="login-brand__list">
+        <li>
+          <span class="material-icons" aria-hidden="true">verified_user</span>
+          <span>Pre-provisioned operator and admin accounts</span>
+        </li>
+        <li>
+          <span class="material-icons" aria-hidden="true">lock</span>
+          <span>Role-based access to monitoring and configuration</span>
+        </li>
+      </ul>
+    </div>
+  </aside>
+
+  <div class="login-main">
+    <div class="login-shell">
+      <header class="login-header">
+        <div class="login-header__mobile-mark" aria-hidden="true">
+          <span class="material-icons">bolt</span>
+        </div>
+        <h2 class="login-title">Sign in</h2>
+        <p class="login-subtitle">Use your assigned organizational account</p>
+        <div class="login-restricted" role="note">
+          <span class="material-icons login-restricted__icon" aria-hidden="true">shield</span>
+          <p class="login-restricted__text">Access is limited to authorized personnel only.</p>
+        </div>
+      </header>
+
+      <section class="login-section" aria-labelledby="role-heading">
+        <h3 id="role-heading" class="section-label">Role</h3>
+        <div class="role-grid" role="radiogroup" aria-label="Role">
+          @for (r of roles; track r.id) {
+            <button
+              type="button"
+              class="role-card"
+              [class.role-card--selected]="selectedRole() === r.id"
+              (click)="selectRole(r.id)"
+              [attr.aria-pressed]="selectedRole() === r.id"
+            >
+              <div class="role-card__top">
+                <span class="role-card__icon-wrap" aria-hidden="true">
+                  @if (r.id === 'operator') {
+                    <app-operator-monitor-icon class="role-card__op-monitor" size="md" />
+                  } @else {
+                    <span class="material-icons role-card__icon mi-fixed">{{ r.icon }}</span>
+                  }
+                </span>
+                @if (selectedRole() === r.id) {
+                  <span class="role-card__check material-icons" aria-hidden="true">check_circle</span>
+                }
+              </div>
+              <span class="role-card__label">{{ r.label }}</span>
+              <span class="role-card__desc">{{ r.description }}</span>
+            </button>
+          }
+        </div>
+      </section>
+
+      <div class="login-divider" role="presentation">
+        <span class="login-divider__line"></span>
+        <span class="login-divider__label">Credentials</span>
+        <span class="login-divider__line"></span>
+      </div>
+
+      <form class="login-form" (ngSubmit)="submit()" novalidate>
+        <label class="field">
+          <span class="field__label">Username</span>
+          <input
+            class="field__input"
+            type="text"
+            name="username"
+            autocomplete="username"
+            [(ngModel)]="username"
+            placeholder="e.g. jane.smith"
+            [disabled]="submitting()"
+          />
+        </label>
+        <label class="field">
+          <span class="field__label">Password</span>
+          <input
+            class="field__input"
+            type="password"
+            name="password"
+            autocomplete="current-password"
+            placeholder="••••••••"
+            [(ngModel)]="password"
+            [disabled]="submitting()"
+          />
+        </label>
+
+        @if (errorMessage(); as err) {
+          <p class="form-error" role="alert">{{ err }}</p>
+        }
+
+        <button
+          type="submit"
+          class="sign-in"
+          [disabled]="submitting()"
+          [attr.aria-busy]="submitting()"
+        >
+          {{ submitting() ? 'Signing in…' : 'Sign in' }}
+        </button>
+      </form>
+
+      <p class="login-footer">Need access? Contact your IT administrator.</p>
+    </div>
+  </div>
+</div>

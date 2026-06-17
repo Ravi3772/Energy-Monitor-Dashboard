@@ -1,0 +1,140 @@
+<div class="dashboard-container" [class.loaded]="selectedLine !== null">
+  <div class="dashboard-hero">
+    <div class="dashboard-hero__bg"></div>
+    <div class="dashboard-hero__bg--overlay"></div>
+    <div class="dashboard-hero__inner">
+      <div class="dashboard-hero__content">
+        <div class="dashboard-hero__titles">
+          <h1 class="dashboard-hero__title">Energy Analytics Dashboard</h1>
+          <p class="dashboard-hero__subtitle">Pick a line to explore usage, trends, and meter-level detail.</p>
+        </div>
+      </div>
+      <div class="dashboard-hero__controls">
+        @if (auth.role() === 'operator') {
+          <div class="dashboard-role-pill" aria-label="Your access level">
+            <span class="dashboard-role-pill__icon-wrap" aria-hidden="true">
+              <app-operator-monitor-icon class="dashboard-role-pill__monitor" size="md" />
+            </span>
+            <span class="dashboard-role-pill__text">Operator</span>
+          </div>
+        }
+        <div class="controls">
+          <label for="dashboard-line-select" class="sr-only">Power line</label>
+          <select
+            id="dashboard-line-select"
+            (change)="selectLine($event)"
+            [value]="selectedLine?.lineId || ''"
+            class="dropdown-select"
+            title="Select a power line"
+          >
+            <option value="" disabled>Select Power Line</option>
+            <option *ngFor="let line of lines" [value]="line.lineId">{{line.lineName}}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span class="label">Total Meters</span>
+      <h2 class="val">{{ stats.totalMeters }}</h2>
+    </div>
+    <div class="stat-card active">
+      <span class="label">Active Meters</span>
+      <h2 class="val">{{ stats.activeMeters }}</h2>
+    </div>
+    <div class="stat-card lines">
+      <span class="label">Total Lines</span>
+      <h2 class="val">{{ stats.totalLines }}</h2>
+    </div>
+    <div class="stat-card energy">
+      <span class="label">Total(kWh)</span>
+      <h2 class="val">{{ stats.totalEnergyToday | number:'1.2-2' }}</h2>
+    </div>
+  </div>
+ 
+  <div *ngIf="selectedLine" class="analytics-layout">
+    <div class="top-row">
+      <div class="overview-card card">
+        <span class="label">{{selectedLine.lineName}} Overview</span>
+        <div class="demand-val">
+          <span class="big-num">{{ selectedLine.totalConsumption }}</span>
+          <span class="unit">kWh</span>
+        </div>
+        <p class="muted">Location: {{selectedLine.location}}</p>
+      </div>
+ 
+      <div class="chart-card card">
+        <div class="chart-header">
+          <span class="label">Demand Trend (Daily Totals)</span>
+          <div class="date-filters">
+            <select [(ngModel)]="selectedMonth" (change)="onDateChange()" class="date-select">
+              <option value="1">January</option>
+              <option value="2">February</option>
+              <option value="3">March</option>
+              <option value="4">April</option>
+              <option value="5">May</option>
+              <option value="6">June</option>
+              <option value="7">July</option>
+              <option value="8">August</option>
+              <option value="9">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </select>
+            <select [(ngModel)]="selectedYear" (change)="onDateChange()" class="date-select">
+              <option *ngFor="let year of availableYears" [value]="year">{{ year }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas #demandChart id="demandChart"></canvas>
+        </div>
+      </div>
+    </div>
+ 
+    <div class="meter-table-section card">
+      <span class="label">Meter Readings</span>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Meter Code</th>
+            <th>Status</th>
+            <th>Peak Hour</th>
+            <th>Peak Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let meter of pagedMeters">
+            <td class="bold">{{ meter.meterCode }}</td>
+            <td>
+              <span [class]="'status-pill ' + (meter.status?.toLowerCase() || 'inactive')">
+                {{ meter.status }}
+              </span>
+            </td>
+            <td class="peak-text">{{ meter.peakHour }}</td>
+            <td class="energy-text">{{ meter.peakValue }} kWh</td>
+          </tr>
+        </tbody>
+      </table>
+ 
+      <div class="pagination-footer">
+        <div class="entries-selector">
+          <span class="muted">Show </span>
+          <input type="number" [(ngModel)]="pageSize" (change)="onPageSizeChange()" min="1" max="10" class="pageSize-input">
+          <span class="muted"> entries</span>
+        </div>
+ 
+        <div class="pagination-navigation">
+          <span class="page-info">Page <strong>{{currentPage}}</strong> of {{totalPages || 1}}</span>
+          <div class="pagination-buttons">
+            <button class="btn-pagination" (click)="changePage(-1)" [disabled]="currentPage === 1">&larr; Previous</button>
+            <button class="btn-pagination" (click)="changePage(1)" [disabled]="currentPage === totalPages || totalPages === 0">Next &rarr;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+ 
